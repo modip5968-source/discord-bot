@@ -14,6 +14,7 @@ const {
 } = require('discord.js');
 require('dotenv').config();
 const { openTicket, closeTicket, isTicketChannel, getTicketOpenerId, welcomeComponents } = require('./tickets');
+const { handlePrefixCommand } = require('./prefix');
 
 const client = new Client({
   intents: [
@@ -147,9 +148,11 @@ async function handleButton(interaction) {
   }
 }
 
-// AFK handling: auto-clear when the user talks, reply when they get mentioned
+// Prefix commands ($ping, $kick @user spam, ...) + AFK handling
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot || !message.guild) return;
+
+  if (await handlePrefixCommand(message, client.commands)) return;
 
   const afk = client.afkUsers;
 

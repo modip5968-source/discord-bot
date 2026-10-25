@@ -22,6 +22,8 @@ A general-purpose Discord bot with slash commands.
 
 - `/ticket-panel` — Post a ticket panel with an "Open a Ticket" button (Manage Channels)
 - `/ticket-panel-edit` — Edit a panel's title, description, image or button label (Manage Channels)
+- `/lock` — Lock a channel so members cannot send messages (Manage Channels)
+- `/unlock` — Unlock a previously locked channel (Manage Channels)
 - `/ticket-open` — Open a private ticket channel (also possible via the panel button)
 - `/ticket-add` — Add a member to a ticket (Manage Channels)
 - `/ticket-close` — Close and delete a ticket (staff or the ticket opener; also possible via the in-ticket button)
@@ -48,6 +50,16 @@ A general-purpose Discord bot with slash commands.
 
 Slash commands are registered automatically on startup. Global commands can take
 up to an hour to appear the first time.
+
+## Prefix commands
+
+Every command also works with the `$` prefix, e.g. `$ping`, `$lock`, `$afk sleeping`.
+
+- Arguments are positional: `$kick @user spamming chat`
+- Use quotes for multi-word arguments: `$poll "Best game?" Minecraft Roblox`
+- The last text argument (reason/message) takes everything remaining
+- User/channel arguments accept mentions (`@user`, `#channel`) or IDs
+- Server permissions are enforced the same way as the slash versions
 
 ## Hosting on bot-hosting.net
 
