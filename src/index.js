@@ -15,6 +15,9 @@ const {
 require('dotenv').config();
 const { openTicket, closeTicket, isTicketChannel, getTicketOpenerId, welcomeComponents } = require('./tickets');
 const { handlePrefixCommand } = require('./prefix');
+const { load } = require('./store');
+const { addXp } = require('./levels');
+const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./giveaways');
 
 const client = new Client({
   intents: [
@@ -53,6 +56,9 @@ client.once(Events.ClientReady, async (c) => {
   } catch (err) {
     console.error('Command registration failed:', err);
   }
+
+  // Resume unfinished giveaways (survives restarts)
+  resumeAll(c);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -88,9 +94,49 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// Ticket button flows
 async function handleButton(interaction) {
   const { customId } = interaction;
+
+  // Giveaway buttons: gw:<id>:join / gw:<id>:reroll
+  if (customId.startsWith('gw:')) {
+    const [, gwId, action] = customId.split(':');
+    const gw = getGiveaway(gwId);
+
+    if (action === 'join') {
+      if (!gw) return interaction.reply({ content: 'This giveaway no longer exists.', ephemeral: true });
+      if (gw.ended) return interaction.reply({ content: 'This giveaway has already ended.', ephemeral: true });
+      if (gw.guildId !== interaction.guildId) return interaction.deferUpdate();
+
+      const idx = gw.participants.indexOf(interaction.user.id);
+      const joined = idx === -1;
+      if (joined) gw.participants.push(interaction.user.id);
+      else gw.participants.splice(idx, 1);
+      putGiveaway(gw);
+
+      try {
+        const message = await interaction.channel.messages.fetch(gw.messageId);
+        await message.edit({
+          embeds: [buildEmbed(gw)],
+        });
+      } catch {
+        // message gone
+      }
+      return interaction.reply({
+        content: joined ? '🎉 You entered the giveaway!' : 'You left the giveaway.',
+        ephemeral: true,
+      });
+    }
+
+    if (action === 'reroll') {
+      if (!interaction.member.permissions.has('ManageGuild')) {
+        return interaction.reply({ content: 'Only staff can reroll.', ephemeral: true });
+      }
+      if (!gw || !gw.ended) return interaction.reply({ content: 'This giveaway has not ended yet.', ephemeral: true });
+      await reroll(interaction.client, gwId);
+      return interaction.reply({ content: '🔄 Rerolled!', ephemeral: true });
+    }
+    return;
+  }
 
   if (customId === 'ticket_open') {
     await interaction.deferReply({ ephemeral: true });
@@ -148,9 +194,44 @@ async function handleButton(interaction) {
   }
 }
 
-// Prefix commands ($ping, $kick @user spam, ...) + AFK handling
+// Welcome message + auto-role on join
+client.on(Events.GuildMemberAdd, async (member) => {
+  try {
+    const cfg = load('guild-config')[member.guild.id] ?? {};
+
+    if (cfg.autoroleId) {
+      await member.roles.add(cfg.autoroleId).catch(() => {});
+    }
+    if (cfg.welcomeChannelId) {
+      const channel = member.guild.channels.cache.get(cfg.welcomeChannelId);
+      if (channel && channel.isTextBased()) {
+        const text = (cfg.welcomeMessage ?? 'Welcome {user} to **{server}**! 🎉')
+          .replaceAll('{user}', member.toString())
+          .replaceAll('{username}', member.user.username)
+          .replaceAll('{server}', member.guild.name);
+        await channel.send(text).catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.error('Welcome/autorole failed:', err);
+  }
+});
+
+// Prefix commands ($ping, $kick @user spam, ...) + XP + AFK handling
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot || !message.guild) return;
+
+  // XP (level-up announcement)
+  try {
+    const result = await addXp(message);
+    if (result?.leveledUp) {
+      await message.channel
+        .send(`🎉 ${message.author} leveled up to **level ${result.level}**!`)
+        .catch(() => {});
+    }
+  } catch {
+    // XP should never break chat
+  }
 
   if (await handlePrefixCommand(message, client.commands)) return;
 

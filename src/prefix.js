@@ -6,6 +6,7 @@ const PREFIX = '$';
 const MENTION_RE = /^<@!?(\d+)>$/;
 const CHANNEL_RE = /^<#(\d+)>$/;
 const ID_RE = /^\d{17,20}$/;
+const ROLE_RE = /^<@&(\d+)>$/;
 
 function tokenize(text) {
   const tokens = [];
@@ -38,46 +39,57 @@ function normalize(name) {
 }
 
 // Parse positional tokens into the command's declared options.
-// Quoted segments count as one argument. The LAST string option slurps
-// whatever remains, so reasons / messages can be multiple words.
+// Quoted segments count as one argument. Each option consumes one token;
+// any leftover tokens are appended to the last text argument, so reasons
+// and messages can be multiple words. Optional options whose token does not
+// look like the right type are skipped instead of consuming the token.
 async function parseOptions(message, command, tokens) {
   const resolved = {};
+  const strings = [];
   const opts = command.data.options ?? [];
   let idx = 0;
 
-  for (let i = 0; i < opts.length; i++) {
-    const opt = opts[i];
-    const isLast = i === opts.length - 1;
-
-    if (opt.type === ApplicationCommandOptionType.String && isLast) {
-      if (idx < tokens.length) {
-        resolved[opt.name] = tokens.slice(idx).join(' ');
-        idx = tokens.length;
-      }
-      break;
-    }
-
+  for (const opt of opts) {
     const tok = tokens[idx];
     if (tok === undefined) break;
 
     switch (opt.type) {
-      case ApplicationCommandOptionType.String:
+      case ApplicationCommandOptionType.String: {
+        // image arguments must look like URLs
+        if (opt.name === 'image' && !/^https?:\/\//i.test(tok)) {
+          if (!opt.required) continue;
+          return { error: `The image must be a valid http(s) URL.` };
+        }
+        // a URL token is almost always meant for a later 'image' option
+        if (
+          opt.name !== 'image' &&
+          /^https?:\/\//i.test(tok) &&
+          opts.some((o) => o.name === 'image')
+        ) {
+          continue;
+        }
         resolved[opt.name] = tok;
+        strings.push(opt.name);
         idx++;
         break;
+      }
 
       case ApplicationCommandOptionType.Integer: {
-        const n = parseInt(tok, 10);
-        if (Number.isNaN(n)) return { error: `\`${tok}\` is not a number.` };
-        resolved[opt.name] = n;
+        if (!/^-?\d+$/.test(tok)) {
+          if (!opt.required) continue;
+          return { error: `\`${tok}\` is not a number.` };
+        }
+        resolved[opt.name] = parseInt(tok, 10);
         idx++;
         break;
       }
 
       case ApplicationCommandOptionType.Boolean: {
         const v = tok.toLowerCase();
-        if (!['true', 'false', 'yes', 'no'].includes(v))
+        if (!['true', 'false', 'yes', 'no'].includes(v)) {
+          if (!opt.required) continue;
           return { error: `\`${tok}\` is not true/false.` };
+        }
         resolved[opt.name] = v === 'true' || v === 'yes';
         idx++;
         break;
@@ -86,10 +98,14 @@ async function parseOptions(message, command, tokens) {
       case ApplicationCommandOptionType.User: {
         const m = tok.match(MENTION_RE);
         const id = m ? m[1] : ID_RE.test(tok) ? tok : null;
-        if (!id) return { error: `\`${tok}\` is not a user mention or ID.` };
+        if (!id) {
+          if (!opt.required) continue;
+          return { error: `\`${tok}\` is not a user mention or ID.` };
+        }
         try {
           resolved[opt.name] = await message.guild.members.fetch(id);
         } catch {
+          if (!opt.required) continue;
           return { error: 'I could not find that member.' };
         }
         idx++;
@@ -99,20 +115,53 @@ async function parseOptions(message, command, tokens) {
       case ApplicationCommandOptionType.Channel: {
         const m = tok.match(CHANNEL_RE);
         const id = m ? m[1] : ID_RE.test(tok) ? tok : null;
-        if (!id) return { error: `\`${tok}\` is not a channel mention or ID.` };
+        if (!id) {
+          if (!opt.required) continue;
+          return { error: `\`${tok}\` is not a channel mention or ID.` };
+        }
         try {
           resolved[opt.name] = await message.guild.channels.fetch(id);
         } catch {
+          if (!opt.required) continue;
           return { error: 'I could not find that channel.' };
         }
         idx++;
         break;
       }
 
+      case ApplicationCommandOptionType.Role: {
+        const m = tok.match(ROLE_RE);
+        const id = m ? m[1] : ID_RE.test(tok) ? tok : null;
+        if (!id) {
+          if (!opt.required) continue;
+          return { error: `\`${tok}\` is not a role mention or ID.` };
+        }
+        try {
+          resolved[opt.name] = await message.guild.roles.fetch(id);
+        } catch {
+          if (!opt.required) continue;
+          return { error: 'I could not find that role.' };
+        }
+        idx++;
+        break;
+      }
+
       default:
-        // Unsupported option type in prefix mode: consume a token
         resolved[opt.name] = tok;
         idx++;
+    }
+  }
+
+  // Append anything left over to the last text argument (never the image URL)
+  if (idx < tokens.length) {
+    const textOpts = (command.data.options ?? []).filter(
+      (o) => o.type === ApplicationCommandOptionType.String && o.name !== 'image'
+    );
+    const last = textOpts[textOpts.length - 1];
+    if (last) {
+      resolved[last.name] = [resolved[last.name], ...tokens.slice(idx)]
+        .filter((part) => part !== undefined && part !== '')
+        .join(' ');
     }
   }
 
@@ -155,7 +204,7 @@ class PrefixInteraction {
         return member ? member.user : null;
       },
       getChannel: (name) => self._resolved[name] ?? null,
-      getRole: () => null,
+      getRole: (name) => self._resolved[name] ?? null,
       getFocused: () => null,
     };
   }

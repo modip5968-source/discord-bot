@@ -51,6 +51,18 @@ A general-purpose Discord bot with slash commands.
 Slash commands are registered automatically on startup. Global commands can take
 up to an hour to appear the first time.
 
+## Shop features
+
+- **Catalog**: `/product-add` (name, price, stock, description, image), `/product-list`, `/product-remove <id>`, `/product-stock <id> <count>` (-1 = unlimited, 0 = sold out). Manage Server.
+- **Vouches**: `/vouch @seller comment` (one per seller per user), `/vouches [@seller]` shows reputation.
+- **Orders**: `/order-new @buyer item` (gets an order number), `/order-status <id> <pending|paid|delivered|cancelled>`, `/order-list`. Manage Server.
+- **Wallet**: `/balance [@user]`, `/pay @user amount`, staff: `/wallet-give`, `/wallet-take`. Manage Server.
+- **Levels**: XP for chatting (15-30 per message, 1 min cooldown). `/rank [@user]` level card, `/leaderboard` top 10.
+- **Giveaways**: `/giveaway prize [winners] [minutes] [channel]` with Enter button, auto-draw, reroll button; survives restarts. Manage Server.
+- **Welcome & auto-role**: `/welcome #channel [message]` with `{user}`, `{username}`, `{server}` placeholders; `/autorole @role`. Manage Server.
+
+Runtime data is stored in `data/*.json` (gitignored, persists across restarts).
+
 ## Prefix commands
 
 Every command also works with the `$` prefix, e.g. `$ping`, `$lock`, `$afk sleeping`.
