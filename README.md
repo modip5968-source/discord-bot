@@ -13,6 +13,17 @@ A general-purpose Discord bot with slash commands.
 - `/eightball` — Ask the magic 8-ball
 - `/avatar` — Show a member's avatar
 - `/serverinfo` — Show info about the server
+- `/say` — Make the bot say something (Manage Messages)
+- `/announce` — Send an announcement embed to a channel (Manage Messages)
+- `/embed` — Send a custom embed with title, text and color (Manage Messages)
+- `/afk` — Set yourself AFK; the bot replies when you get mentioned and clears it when you return
+
+## Ticket system
+
+- `/ticket-panel` — Post a ticket panel with an "Open a Ticket" button (Manage Channels)
+- `/ticket-open` — Open a private ticket channel (also possible via the panel button)
+- `/ticket-add` — Add a member to a ticket (Manage Channels)
+- `/ticket-close` — Close and delete a ticket (staff or the ticket opener; also possible via the in-ticket button)
 
 ## Setup
 
@@ -37,7 +48,7 @@ A general-purpose Discord bot with slash commands.
 Slash commands are registered automatically on startup. Global commands can take
 up to an hour to appear the first time.
 
-## Hosting on bot-hosting.in
+## Hosting on bot-hosting.net
 
 1. Create a new Node.js app and point it at this repo (or upload the files).
 2. Set the start command to `npm start`.

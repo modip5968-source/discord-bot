@@ -8,8 +8,12 @@ const {
   REST,
   Routes,
   Events,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
 } = require('discord.js');
 require('dotenv').config();
+const { openTicket, closeTicket, isTicketChannel, getTicketOpenerId, welcomeComponents } = require('./tickets');
 
 const client = new Client({
   intents: [
@@ -20,6 +24,9 @@ const client = new Client({
   ],
   partials: [Partials.Channel],
 });
+
+// In-memory AFK store (resets on restart)
+client.afkUsers = new Collection();
 
 // Load commands
 client.commands = new Collection();
@@ -48,6 +55,20 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.isButton()) {
+    try {
+      await handleButton(interaction);
+    } catch (err) {
+      console.error('Error in button handler:', err);
+      if (!interaction.replied) {
+        await interaction
+          .reply({ content: 'Something went wrong handling that button.', ephemeral: true })
+          .catch(() => {});
+      }
+    }
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
@@ -64,6 +85,98 @@ client.on(Events.InteractionCreate, async (interaction) => {
       await interaction.reply(reply);
     }
   }
+});
+
+// Ticket button flows
+async function handleButton(interaction) {
+  const { customId } = interaction;
+
+  if (customId === 'ticket_open') {
+    await interaction.deferReply({ ephemeral: true });
+    try {
+      const channel = await openTicket(interaction.guild, interaction.user);
+      await interaction.editReply(`🎫 Ticket opened: ${channel}`);
+    } catch (err) {
+      console.error('Error opening ticket:', err);
+      await interaction.editReply('I could not open a ticket (missing permissions or channel limit reached).');
+    }
+    return;
+  }
+
+  if (customId === 'ticket_close') {
+    if (!isTicketChannel(interaction.channel)) return;
+    const openerId = getTicketOpenerId(interaction.channel);
+    const canClose =
+      interaction.member.permissions.has('ManageChannels') ||
+      interaction.user.id === openerId;
+
+    if (!canClose) {
+      return interaction.reply({ content: 'Only staff or the ticket opener can close this ticket.', ephemeral: true });
+    }
+
+    await interaction.update({
+      content: `⚠️ <@${interaction.user.id}> wants to close this ticket. Close it?`,
+      components: [
+        new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId('ticket_close_confirm')
+            .setLabel('✅ Confirm Close')
+            .setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setCustomId('ticket_close_cancel')
+            .setLabel('❌ Cancel')
+            .setStyle(ButtonStyle.Secondary)
+        ),
+      ],
+    });
+    return;
+  }
+
+  if (customId === 'ticket_close_confirm') {
+    await interaction.update({ content: '🔒 Closing ticket...', components: [] });
+    await closeTicket(interaction.channel, interaction.user);
+    return;
+  }
+
+  if (customId === 'ticket_close_cancel') {
+    await interaction.update({
+      content: '❌ Close cancelled.',
+      components: [welcomeComponents()],
+    });
+    return;
+  }
+}
+
+// AFK handling: auto-clear when the user talks, reply when they get mentioned
+client.on(Events.MessageCreate, async (message) => {
+  if (message.author.bot || !message.guild) return;
+
+  const afk = client.afkUsers;
+
+  // Clear AFK when the AFK user sends a message
+  if (afk.has(message.author.id)) {
+    afk.delete(message.author.id);
+    const notif = await message.channel
+      .send(`👋 Welcome back, <@${message.author.id}>! Your AFK status was cleared.`)
+      .catch(() => null);
+    if (notif) setTimeout(() => notif.delete().catch(() => {}), 10000);
+    return;
+  }
+
+  // Reply when someone mentions an AFK user
+  const mentioned = message.mentions.users.filter(
+    (u) => !u.bot && u.id !== message.author.id && afk.has(u.id)
+  );
+  if (mentioned.size === 0) return;
+
+  const lines = mentioned.map((u) => {
+    const entry = afk.get(u.id);
+    const mins = Math.floor((Date.now() - entry.since) / 60000);
+    return `💤 <@${u.id}> is AFK: **${entry.reason}** (${mins < 1 ? 'less than a minute' : `${mins} min ago`})`;
+  });
+
+  const notif = await message.channel.send(lines.join('\n')).catch(() => null);
+  if (notif) setTimeout(() => notif.delete().catch(() => {}), 15000);
 });
 
 client.login(process.env.DISCORD_TOKEN);
