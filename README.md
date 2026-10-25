@@ -21,6 +21,7 @@ A general-purpose Discord bot with slash commands.
 ## Ticket system
 
 - `/ticket-panel` — Post a ticket panel with an "Open a Ticket" button (Manage Channels)
+- `/ticket-panel-edit` — Edit a panel's title, description, image or button label (Manage Channels)
 - `/ticket-open` — Open a private ticket channel (also possible via the panel button)
 - `/ticket-add` — Add a member to a ticket (Manage Channels)
 - `/ticket-close` — Close and delete a ticket (staff or the ticket opener; also possible via the in-ticket button)

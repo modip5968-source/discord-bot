@@ -127,11 +127,22 @@ async function closeTicket(channel, closedBy) {
   }, 5000);
 }
 
+
+// Accepts a discord.com/channels/<guild>/<channel>/<message> link or a bare message ID
+function parseMessageRef(ref, fallbackChannelId) {
+  const match = String(ref).match(/channels\/(\d+)\/(\d+)\/(\d+)/);
+  if (match) return { channelId: match[2], messageId: match[3] };
+  const id = String(ref).replace(/[^0-9]/g, '');
+  if (/^\d{17,20}$/.test(id)) return { channelId: fallbackChannelId, messageId: id };
+  return null;
+}
+
 module.exports = {
   TICKET_TOPIC_PREFIX,
   TICKET_CHANNEL_PREFIX,
   isTicketChannel,
   getTicketOpenerId,
+  parseMessageRef,
   openTicket,
   closeTicket,
   welcomeComponents,

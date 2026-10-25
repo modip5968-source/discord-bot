@@ -18,10 +18,15 @@ module.exports = {
         .setDescription('Channel to post the panel in (defaults to this one)')
         .addChannelTypes(ChannelType.GuildText)
     )
+    .addStringOption((opt) =>
+      opt.setName('image').setDescription('Image URL shown on the panel')
+    )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
     .setDMPermission(false),
   async execute(interaction) {
     const channel = interaction.options.getChannel('channel') ?? interaction.channel;
+
+    const image = interaction.options.getString('image');
 
     const embed = new EmbedBuilder()
       .setTitle('🎫 Support Tickets')
@@ -29,6 +34,8 @@ module.exports = {
         'Need help? Click the button below to open a private ticket with staff.'
       )
       .setColor(0x5865f2);
+
+    if (image) embed.setImage(image);
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
