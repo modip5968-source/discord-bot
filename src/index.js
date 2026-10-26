@@ -18,6 +18,7 @@ const { handlePrefixCommand } = require('./prefix');
 const { load } = require('./store');
 const { addXp } = require('./levels');
 const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./giveaways');
+const { enforceAll, checkJoin } = require('./guild-guard');
 
 const client = new Client({
   intents: [
@@ -59,6 +60,10 @@ client.once(Events.ClientReady, async (c) => {
 
   // Resume unfinished giveaways (survives restarts)
   resumeAll(c);
+
+  // Leave any server not on the allowlist
+  const left = await enforceAll(c);
+  if (left > 0) console.log(`Guild guard: left ${left} unauthorized server(s)`);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -193,6 +198,11 @@ async function handleButton(interaction) {
     return;
   }
 }
+
+// Instantly leave servers that aren't on the allowlist
+client.on(Events.GuildCreate, (guild) => {
+  checkJoin(guild).catch((e) => console.error('Guild guard failed:', e));
+});
 
 // Welcome message + auto-role on join
 client.on(Events.GuildMemberAdd, async (member) => {
