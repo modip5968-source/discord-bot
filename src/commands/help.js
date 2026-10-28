@@ -5,8 +5,9 @@ const CATEGORIES = {
   '🛒 Shop': ['product-add', 'product-list', 'product-remove', 'product-stock', 'vouch', 'vouches', 'order-new', 'order-status', 'order-list'],
   '💰 Wallet & Levels': ['balance', 'pay', 'wallet-give', 'wallet-take', 'rank', 'leaderboard'],
   '🎉 Giveaways': ['giveaway'],
+  '👋 Members': ['welcome', 'goodbye', 'boost', 'invites', 'autorole'],
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'ticket-add', 'ticket-close'],
-  '🧰 Utility': ['help', 'ping', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk', 'welcome', 'autorole'],
+  '🧰 Utility': ['help', 'ping', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll'],
 };
 

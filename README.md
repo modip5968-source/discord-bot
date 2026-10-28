@@ -59,7 +59,11 @@ up to an hour to appear the first time.
 - **Wallet**: `/balance [@user]`, `/pay @user amount`, staff: `/wallet-give`, `/wallet-take`. Manage Server.
 - **Levels**: XP for chatting (15-30 per message, 1 min cooldown). `/rank [@user]` level card, `/leaderboard` top 10.
 - **Giveaways**: `/giveaway prize [winners] [minutes] [channel]` with Enter button, auto-draw, reroll button; survives restarts. Manage Server.
-- **Welcome & auto-role**: `/welcome #channel [message]` with `{user}`, `{username}`, `{server}` placeholders; `/autorole @role`. Manage Server.
+- **Welcome**: `/welcome #channel [message] [embed] [dm]` - placeholders: `{user}`, `{username}`, `{server}`, `{count}`, `{inviter}`, `{created}`. Manage Server.
+- **Goodbye**: `/goodbye #channel [message] [embed]` for members who leave. Manage Server.
+- **Boosts**: `/boost #channel [message] [embed]` thanks the booster and shows the boost count. Manage Server.
+- **Invites**: automatic invite tracking (who invited whom, credit removed when someone leaves). `/invites` = leaderboard, `/invites @member` = their stats and who they brought in.
+- **Auto-role**: `/autorole @role` gives new members the role automatically. Manage Server.
 
 Runtime data is stored in `data/*.json` (gitignored, persists across restarts).
 

@@ -19,6 +19,8 @@ const { load } = require('./store');
 const { addXp } = require('./levels');
 const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./giveaways');
 const { enforceAll, checkJoin } = require('./guild-guard');
+const invites = require('./invites');
+const { buildPayload } = require('./member-messages');
 
 const client = new Client({
   intents: [
@@ -60,6 +62,9 @@ client.once(Events.ClientReady, async (c) => {
 
   // Resume unfinished giveaways (survives restarts)
   resumeAll(c);
+
+  // Cache invite uses so we can tell who invited each new member
+  await invites.cacheAll(c);
 
   // Leave any server not on the allowlist
   const left = await enforceAll(c);
@@ -198,6 +203,115 @@ async function handleButton(interaction) {
     return;
   }
 }
+
+// Instantly leave servers that aren't on the allowlist
+client.on(Events.GuildCreate, (guild) => {
+  checkJoin(guild).catch((e) => console.error('Guild guard failed:', e));
+});
+
+// Join: welcome message, DM, auto-role and invite tracking
+client.on(Events.GuildMemberAdd, async (member) => {
+  try {
+    // Record who invited them (skip bots)
+    let inviterId = null;
+    if (!member.user.bot) {
+      const { inviter } = await invites.recordJoin(member);
+      inviterId = inviter?.id ?? null;
+    }
+
+    const cfg = load('guild-config')[member.guild.id] ?? {};
+
+    if (cfg.autoroleId) {
+      await member.roles.add(cfg.autoroleId).catch(() => {});
+    }
+
+    const ctx = {
+      mention: member.toString(),
+      username: member.user.username,
+      tag: member.user.tag,
+      server: member.guild.name,
+      count: member.guild.memberCount,
+      inviterId,
+      avatarUrl: member.user.displayAvatarURL(),
+      footer: `Member #${member.guild.memberCount}`,
+      createdAt: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`,
+    };
+
+    if (cfg.welcomeChannelId) {
+      const channel = member.guild.channels.cache.get(cfg.welcomeChannelId);
+      if (channel?.isTextBased()) {
+        await channel.send(buildPayload('welcome', cfg, ctx)).catch(() => {});
+      }
+    }
+
+    if (cfg.welcomeDm) {
+      await member.send(buildPayload('welcome', cfg, ctx)).catch(() => {});
+    }
+  } catch (err) {
+    console.error('Join handler failed:', err);
+  }
+});
+
+// Leave: goodbye message + remove invite credit
+client.on(Events.GuildMemberRemove, async (member) => {
+  try {
+    if (!member.user.bot) invites.recordLeave(member);
+
+    const cfg = load('guild-config')[member.guild.id] ?? {};
+    if (!cfg.goodbyeChannelId) return;
+
+    const channel = member.guild.channels.cache.get(cfg.goodbyeChannelId);
+    if (!channel?.isTextBased()) return;
+
+    await channel
+      .send(
+        buildPayload('goodbye', cfg, {
+          username: member.user.username,
+          tag: member.user.tag,
+          server: member.guild.name,
+          count: member.guild.memberCount,
+          avatarUrl: member.user.displayAvatarURL(),
+          footer: `Member #${member.guild.memberCount}`,
+        })
+      )
+      .catch(() => {});
+  } catch (err) {
+    console.error('Leave handler failed:', err);
+  }
+});
+
+// Boost: thank the booster
+client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+  try {
+    const isNewBoost = !oldMember.premiumSince && Boolean(newMember.premiumSince);
+    if (!isNewBoost) return;
+
+    const cfg = load('guild-config')[newMember.guild.id] ?? {};
+    if (!cfg.boostChannelId) return;
+
+    const channel = newMember.guild.channels.cache.get(cfg.boostChannelId);
+    if (!channel?.isTextBased()) return;
+
+    await channel
+      .send(
+        buildPayload('boost', cfg, {
+          mention: newMember.toString(),
+          username: newMember.user.username,
+          server: newMember.guild.name,
+          count: newMember.guild.premiumSubscriptionCount ?? 0,
+          avatarUrl: newMember.user.displayAvatarURL(),
+          footer: `${newMember.guild.premiumSubscriptionCount ?? 0} total boost(s)`,
+        })
+      )
+      .catch(() => {});
+  } catch (err) {
+    console.error('Boost handler failed:', err);
+  }
+});
+
+// Keep the invite cache accurate
+client.on(Events.InviteCreate, (invite) => invites.onInviteCreate(invite));
+client.on(Events.InviteDelete, (invite) => invites.onInviteDelete(invite));
 
 // Instantly leave servers that aren't on the allowlist
 client.on(Events.GuildCreate, (guild) => {
