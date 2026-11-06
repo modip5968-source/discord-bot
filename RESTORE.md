@@ -1,24 +1,27 @@
-# GAMER.GG | MARKETPLACE - Backup
+# 亗 VEXORA - Discord Bot Source
 
-This is a complete backup of the Discord bot (41 commands), commit 74cb7dc (Oct 25, 2026).
+Complete source for the VEXORA bot (44 slash commands + "$" prefix versions).
+Last code commit: ba975d6 (Nov 2026). Repository: github.com/modip5968-source/discord-bot
 
-## What's inside
-- `src/` - all code: 41 commands (src/commands/), prefix adapter (src/prefix.js),
-  ticket system (src/tickets.js), giveaways (src/giveaways.js), levels (src/levels.js),
-  JSON store (src/store.js), main entry (src/index.js)
-- `package.json` / `package-lock.json` - dependencies (discord.js v14)
-- `README.md` - full command reference
+## Structure
+- src/index.js            entry point: events, buttons, startup, command registration
+- src/prefix.js           "$" prefix command adapter (quotes, positional args)
+- src/store.js            JSON data storage in data/*.json
+- src/tickets.js          ticket channels + panel
+- src/giveaways.js        persistent giveaways (survive restarts)
+- src/levels.js           XP / levels / leaderboard
+- src/invites.js          invite tracking (who invited whom)
+- src/member-messages.js  welcome / goodbye / boost rendering + placeholders
+- src/guild-guard.js      allowlist: bot auto-leaves unknown servers
+- src/commands/*.js       44 commands (one file each)
 
-## Not included (on purpose)
-- `.env` with the DISCORD_TOKEN (stored as a secret in the hosting panel)
-- `data/*.json` runtime data (products, vouches, orders, wallets, XP) - lives on the host
-- `node_modules` (installed automatically with `npm install`)
+## Run it
+1. npm install
+2. Create .env with: DISCORD_TOKEN=<your bot token>
+3. node src/index.js
+Commands register automatically on startup.
 
-## To restore on any host
-1. Unzip, run `npm install`
-2. Create a `.env` file: `DISCORD_TOKEN=<bot token>`
-3. Run `node src/index.js`
-4. Bot registers all 41 slash commands on startup
-
-Say "restore this bot" and hand this zip back to the assistant - the full history,
-architecture and deployment steps are in its memory.
+## Notes
+- data/*.json holds runtime data (products, vouches, orders, wallets, levels, invites, config). It is gitignored and NOT in this zip.
+- Allowed servers are listed in src/guild-guard.js (DEFAULT_ALLOWED). Add a guild ID there to allow a new server.
+- Requires Node.js 18+ (uses fetch and AbortSignal.timeout).
