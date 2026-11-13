@@ -20,6 +20,7 @@ const { addXp } = require('./levels');
 const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./giveaways');
 const { enforceAll, checkJoin } = require('./guild-guard');
 const invites = require('./invites');
+const middleman = require('./middleman');
 const { buildPayload } = require('./member-messages');
 
 const client = new Client({
@@ -72,6 +73,22 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  // Middleman: trade modal + partner picker + trade buttons
+  try {
+    if (interaction.isModalSubmit() && interaction.customId.startsWith('mm:modal:')) {
+      return await middleman.handleModal(interaction);
+    }
+    if (interaction.isUserSelectMenu() && interaction.customId === 'mm:pickpartner') {
+      return await middleman.handleUserSelect(interaction);
+    }
+  } catch (err) {
+    console.error('Error in middleman interaction:', err);
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.reply({ content: 'Something went wrong opening that trade.', ephemeral: true }).catch(() => {});
+    }
+    return;
+  }
+
   if (interaction.isButton()) {
     try {
       await handleButton(interaction);
@@ -106,6 +123,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 async function handleButton(interaction) {
   const { customId } = interaction;
+
+  // Middleman trade buttons
+  if (customId.startsWith('mm:')) {
+    return middleman.handleButton(interaction);
+  }
 
   // Giveaway buttons: gw:<id>:join / gw:<id>:reroll
   if (customId.startsWith('gw:')) {

@@ -7,6 +7,7 @@ const CATEGORIES = {
   '🎉 Giveaways': ['giveaway'],
   '👋 Members': ['welcome', 'goodbye', 'boost', 'invites', 'autorole'],
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'ticket-add', 'ticket-close'],
+  '🤝 Middleman': ['mm-setup', 'middleman'],
   '🧰 Utility': ['help', 'ping', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll'],
 };

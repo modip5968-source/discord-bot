@@ -64,6 +64,11 @@ up to an hour to appear the first time.
 - **Boosts**: `/boost #channel [message] [embed]` thanks the booster and shows the boost count. Manage Server.
 - **Invites**: automatic invite tracking (who invited whom, credit removed when someone leaves). `/invites` = leaderboard, `/invites @member` = their stats and who they brought in.
 - **Auto-role**: `/autorole @role` gives new members the role automatically. Manage Server.
+- **Middleman**: `/mm-setup @mmrole #logs [#category]` posts the request panel; `/middleman @partner` opens a trade.
+  Flow: both traders confirm terms -> staff middleman claims -> middleman collects items -> marks Items Collected ->
+  both traders press "I Received My Items" -> transcript posted to the log channel and the ticket auto-closes.
+  Cancel is allowed by traders before collection, by the middleman any time. Max 3 open tickets per user.
+  The bot never holds items - a human with the MM role does; the bot enforces the process and logs everything.
 
 Runtime data is stored in `data/*.json` (gitignored, persists across restarts).
 
