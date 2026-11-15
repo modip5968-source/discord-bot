@@ -9,7 +9,7 @@ const CATEGORIES = {
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'ticket-add', 'ticket-close'],
   '🤝 Middleman': ['mm-setup', 'middleman'],
   '🧰 Utility': ['help', 'latency', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
-  '🎲 Fun': ['eightball', 'roll', 'poll'],
+  '🎲 Fun': ['eightball', 'roll', 'poll', 'lol'],
 };
 
 module.exports = {
