@@ -28,7 +28,7 @@ module.exports = {
     // acknowledge immediately so the slash command does not time out
     await interaction.deferReply({ ephemeral: true }).catch(() => {});
 
-    const text = `lol ${target} got ezzzz`;
+    const text = `Lol ${target} got ezzz 😂🤣`;
     for (let i = 0; i < TIMES; i++) {
       await channel
         .send({ content: text, allowedMentions: { users: [target.id] } })
