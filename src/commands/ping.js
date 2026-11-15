@@ -3,12 +3,15 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription("Check the bot's latency"),
+    .setDescription('Check the bot\'s latency'),
   async execute(interaction) {
-    const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
-    const roundtrip = sent.createdTimestamp - interaction.createdTimestamp;
-    await interaction.editReply(
-      `🏓 Pong! Roundtrip: **${roundtrip}ms** | API: **${interaction.client.ws.ping}ms**`
-    );
+    // Works as /ping and as $ping (the prefix shim supplies the same interface)
+    const user = interaction.user ?? interaction.member?.user;
+    const mention = user ? `${user}` : 'someone';
+
+    await interaction.reply({
+      content: `who tf woke me up 😡 ${mention} who used this command · 🏓 ${Math.round(interaction.client.ws.ping)}ms`,
+      allowedMentions: { users: user ? [user.id] : [] },
+    });
   },
 };
