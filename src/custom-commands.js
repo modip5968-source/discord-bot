@@ -256,10 +256,10 @@ function createModal() {
       .setRequired(false),
     new TextInputBuilder()
       .setCustomId('buttons')
-      .setLabel('Buttons (optional) - one per line: Label | action')
+      .setLabel('Buttons (optional): Label | action')
       .setStyle(TextInputStyle.Paragraph)
       .setMaxLength(1000)
-      .setPlaceholder('Accept | role: Member\ntext: Hello! | text: Hi there\nRules | link: https://example.com\nOpen ticket | ticket')
+      .setPlaceholder('Accept | role: Member\nHelp | ticket\nSite | link: https://x.com')
       .setRequired(false),
   ];
 
