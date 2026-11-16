@@ -65,13 +65,20 @@ module.exports = {
   infoRow,
 
   async handleButton(interaction) {
-    // Buttons are acknowledgement-only: no visible reply, just silence.
-    // deferReply keeps Discord from showing "This interaction failed".
-    if (interaction.customId.startsWith('mmi:')) {
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.deferReply({ ephemeral: true }).catch(() => {});
-      }
-      return;
+    const mention = interaction.user;
+
+    if (interaction.customId === 'mmi:understood') {
+      return interaction.reply({
+        content: `**${mention} has understood !!**`,
+        allowedMentions: { users: [interaction.user.id] },
+      });
+    }
+
+    if (interaction.customId === 'mmi:confused') {
+      return interaction.reply({
+        content: `**${mention} is still confused don't worry staff will help you !!**`,
+        allowedMentions: { users: [interaction.user.id] },
+      });
     }
 
   },
