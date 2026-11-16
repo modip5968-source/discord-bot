@@ -8,7 +8,7 @@ const CATEGORIES = {
   '👋 Members': ['welcome', 'goodbye', 'boost', 'invites', 'autorole'],
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'ticket-add', 'ticket-close'],
   '🤝 Middleman': ['mm-setup', 'middleman'],
-  '🧰 Utility': ['help', 'latency', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
+  '🧰 Utility': ['help', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll', 'lol'],
 };
 

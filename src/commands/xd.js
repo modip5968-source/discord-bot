@@ -2,10 +2,10 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('latency')
+    .setName('xd')
     .setDescription('Check the bot\'s latency'),
   async execute(interaction) {
-    // Works as /latency and as $latency (the prefix shim supplies the same interface)
+    // Works as /xd and as $xd (the prefix shim supplies the same interface)
     const user = interaction.user ?? interaction.member?.user;
     const mention = user ? `${user}` : 'someone';
 
