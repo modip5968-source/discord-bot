@@ -8,6 +8,7 @@ const DEFAULT_ALLOWED = [
   '1550700766564589578', // BlazeXStudio | Aru<3
   '1563909583884259411', // TEST SERVER | SHOP BOT
   '1541996412546322588', // VEXORA 💸 | BUY • SELL
+  '1571214441259864105', // Obsidian MM Service
 ];
 
 function getConfig() {
