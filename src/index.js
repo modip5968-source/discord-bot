@@ -125,6 +125,11 @@ async function handleButton(interaction) {
   const { customId } = interaction;
 
   // Middleman trade buttons
+  // "What is a middleman" explainer buttons
+  if (customId.startsWith('mmi:')) {
+    return require('./commands/middleman').handleButton(interaction);
+  }
+
   if (customId.startsWith('mm:')) {
     return middleman.handleButton(interaction);
   }
