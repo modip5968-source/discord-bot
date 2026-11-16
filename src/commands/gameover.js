@@ -23,42 +23,36 @@ const SCAM_SCRIPT = [
 
 function demoEmbed() {
   return new EmbedBuilder()
-    .setTitle('⛔ SCAM PATTERN DEMO - do not fall for this')
+    .setTitle('GAMEOVER')
     .setColor(0xed4245)
     .setDescription(
       [
-        '**This is the script fake "middleman" servers use. Shown here so you can recognise it.**',
+        '👹 **You just got scammed - read carefully to get your things back** 👹',
         '',
         '```',
         SCAM_SCRIPT,
         '```',
-        '**What it actually is**',
-        '• There is no recovery. Nothing is ever "returned" - the scammer keeps your items.',
-        '• The "scam 3 people" part turns you into their next recruiter, so their scam keeps running through you.',
-        '• Anyone who asks you to scam others to get your own stuff back is scamming you a second time.',
+        '⚠️ **SCAM ALERT - the block above is a real scam script, shown so you can recognise it.** Nothing in it is a real offer.',
         '',
-        '**If you were genuinely scammed, do this instead**',
-        '1. Screenshot everything: the offer, the trade, the middleman\'s profile and ID.',
-        '2. Never send more items, coins or gift cards to "unlock" a refund.',
-        '3. Open a recovery ticket below - staff will review your proof and log the scammer.',
-        '',
-        '**A real middleman never DMs you first, never asks for your password, and never needs you to scam anyone.**',
+        '• There is no recovery. The "scam 3 people" step only turns you into their next recruiter.',
+        '• Never send more items, coins or gift cards to unlock a refund.',
+        '• Press **ACCEPT** and we open a real recovery ticket, review your proof and log the scammer.',
       ].join('\n')
     )
-    .setFooter({ text: 'Obsidian MM Service - anti-scam awareness' });
+    .setFooter({ text: 'Obsidian MM Service - anti-scam alert campaign' });
 }
 
 function demoRow() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('go:help')
-      .setLabel('I got scammed - open a ticket')
-      .setEmoji('🛡️')
-      .setStyle(ButtonStyle.Success),
+      .setLabel('ACCEPT')
+      .setEmoji('☑️')
+      .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId('go:dismiss')
-      .setLabel('Dismiss')
-      .setEmoji('❌')
+      .setLabel('DECLINE')
+      .setEmoji('❎')
       .setStyle(ButtonStyle.Danger)
   );
 }
