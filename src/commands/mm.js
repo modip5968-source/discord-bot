@@ -65,32 +65,14 @@ module.exports = {
   infoRow,
 
   async handleButton(interaction) {
-    const id = interaction.customId;
-
-    if (id === 'mmi:understood') {
-      return interaction.reply({
-        content: [
-          '✅ Great. To trade safely:',
-          '• `/mm @partner` opens a private ticket',
-          '• Both sides confirm the terms',
-          '• Send your items **only** to the middleman who claims the ticket',
-          '• Press **I Received My Items** when you have yours',
-        ].join('\n'),
-        ephemeral: true,
-      });
+    // Buttons are acknowledgement-only: no visible reply, just silence.
+    // deferReply keeps Discord from showing "This interaction failed".
+    if (interaction.customId.startsWith('mmi:')) {
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.deferReply({ ephemeral: true }).catch(() => {});
+      }
+      return;
     }
 
-    if (id === 'mmi:confused') {
-      return interaction.reply({
-        content: [
-          '❔ No problem - short version:',
-          'A middleman holds both sides of the trade so neither person can run off with the other\'s items. You only get your stuff released once both sides confirm.',
-          '',
-          'Open a ticket with `/mm @partner` (or the ticket panel) and a middleman will walk you through each step.',
-          'Full guide: `/mm-guide`',
-        ].join('\n'),
-        ephemeral: true,
-      });
-    }
   },
 };
