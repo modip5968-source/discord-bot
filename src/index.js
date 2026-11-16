@@ -21,7 +21,6 @@ const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./g
 const { enforceAll, checkJoin } = require('./guild-guard');
 const invites = require('./invites');
 const middleman = require('./middleman');
-const customCommands = require('./custom-commands');
 const { buildPayload } = require('./member-messages');
 
 const client = new Client({
@@ -62,10 +61,6 @@ client.once(Events.ClientReady, async (c) => {
     console.error('Command registration failed:', err);
   }
 
-  // Re-register each server's custom commands
-  const customCount = await customCommands.registerAll(c);
-  if (customCount > 0) console.log(`Custom commands: registered ${customCount}`);
-
   // Resume unfinished giveaways (survives restarts)
   resumeAll(c);
 
@@ -78,26 +73,6 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  // Custom command builder (/command create form)
-  if (interaction.isModalSubmit() && interaction.customId === 'cc:create') {
-    try {
-      return await customCommands.handleCreateModal(interaction);
-    } catch (err) {
-      console.error('Custom command create failed:', err);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({ content: 'Could not save that command.', ephemeral: true }).catch(() => {});
-      }
-      return;
-    }
-  }
-
-  // Autocomplete (custom command names)
-  if (interaction.isAutocomplete()) {
-    const cmd = client.commands.get(interaction.commandName);
-    if (cmd?.autocomplete) await cmd.autocomplete(interaction).catch(() => {});
-    return;
-  }
-
   // Middleman: trade modal + partner picker + trade buttons
   try {
     if (interaction.isModalSubmit() && interaction.customId.startsWith('mm:modal:')) {
@@ -131,17 +106,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
-  if (!command) {
-    // not built in - maybe this server made it with /command create
-    const custom = customCommands.get(interaction.guildId, interaction.commandName);
-    if (!custom) return;
-    try {
-      return await customCommands.replyWith(interaction, interaction.guildId, interaction.commandName, custom);
-    } catch (err) {
-      console.error('Custom command failed:', err);
-      return;
-    }
-  }
+  if (!command) return;
 
   try {
     await command.execute(interaction);
@@ -162,16 +127,6 @@ async function handleButton(interaction) {
   // Middleman trade buttons
   if (customId.startsWith('mm:')) {
     return middleman.handleButton(interaction);
-  }
-
-  // Custom command buttons
-  if (customId.startsWith('cc:')) {
-    return customCommands.runButton(interaction);
-  }
-
-  // Anti-scam demo buttons (/gameover)
-  if (customId.startsWith('go:')) {
-    return require('./commands/gameover').handleButton(interaction);
   }
 
   // Giveaway buttons: gw:<id>:join / gw:<id>:reroll
@@ -425,19 +380,6 @@ client.on(Events.MessageCreate, async (message) => {
   }
 
   if (await handlePrefixCommand(message, client.commands)) return;
-
-  // Custom commands via $prefix
-  if (message.content.startsWith('$')) {
-    const name = message.content.slice(1).trim().split(/\s+/)[0]?.toLowerCase();
-    const custom = name ? customCommands.get(message.guild.id, name) : null;
-    if (custom) {
-      const payload = { embeds: [customCommands.buildEmbed(custom)] };
-      const row = customCommands.buildRow(message.guild.id, name, custom);
-      if (row) payload.components = [row];
-      await message.reply(payload).catch(() => {});
-      return;
-    }
-  }
 
   const afk = client.afkUsers;
 

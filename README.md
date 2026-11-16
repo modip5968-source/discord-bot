@@ -67,10 +67,6 @@ up to an hour to appear the first time.
 - **Moderation**: `/ban`, `/unban` (by user ID), `/kick`, `/mute` (1m / 1h / 1d, max 28d), `/unmute`, `/warn`, `/unwarn`, `/warnings`, `/lock`, `/unlock`.
 - **Roles**: `/promo @user @role` gives a role, `/demo @user @role` removes one. Manage Roles, respects role hierarchy.
 - **Tickets**: `/add @user` adds someone to a ticket (or a middleman trade), `/transfer @user` hands the ticket to another staff member.
-- **Custom commands**: `/command create` opens a form - command name, embed title, text, optional image URL, and optional buttons.
-  Button lines are `Label | action`, where action is one of `role: <name or ID>`, `unrole: <name or ID>`,
-  `ticket`, `text: <message>`, `link: <url>`. Created commands work as `/<name>` and `$<name>` in that server only.
-  `/command list` shows them, `/command delete <name>` removes one (also unregisters it from Discord). Manage Server.
 - **MM staff toolkit**: `/mm-claim` (claim the ticket you're in), `/mm-release` (items released),
   `/mm-cancel <reason>` (cancel + archive transcript), `/mm-list` (every open trade), `/mm-stats [middleman]`
   (completed / cancelled / completion rate), `/mm-fee <amount> [percent]` (fee calculator, default 5%),
