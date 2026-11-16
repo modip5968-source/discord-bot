@@ -129,6 +129,11 @@ async function handleButton(interaction) {
     return middleman.handleButton(interaction);
   }
 
+  // Anti-scam demo buttons (/gameover)
+  if (customId.startsWith('go:')) {
+    return require('./commands/gameover').handleButton(interaction);
+  }
+
   // Giveaway buttons: gw:<id>:join / gw:<id>:reroll
   if (customId.startsWith('gw:')) {
     const [, gwId, action] = customId.split(':');
