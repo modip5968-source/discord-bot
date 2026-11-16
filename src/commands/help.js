@@ -10,7 +10,7 @@ const CATEGORIES = {
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'add', 'transfer', 'ticket-close'],
   '🚨 Anti-scam': ['gameover'],
   '🤝 Middleman': ['mm-setup', 'middleman'],
-  '🧰 Utility': ['help', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
+  '🧰 Utility': ['help', 'command', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll', 'lol'],
 };
 
