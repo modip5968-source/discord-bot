@@ -64,6 +64,9 @@ up to an hour to appear the first time.
 - **Boosts**: `/boost #channel [message] [embed]` thanks the booster and shows the boost count. Manage Server.
 - **Invites**: automatic invite tracking (who invited whom, credit removed when someone leaves). `/invites` = leaderboard, `/invites @member` = their stats and who they brought in.
 - **Auto-role**: `/autorole @role` gives new members the role automatically. Manage Server.
+- **Moderation**: `/ban`, `/unban` (by user ID), `/kick`, `/mute` (1m / 1h / 1d, max 28d), `/unmute`, `/warn`, `/unwarn`, `/warnings`, `/lock`, `/unlock`.
+- **Roles**: `/promo @user @role` gives a role, `/demo @user @role` removes one. Manage Roles, respects role hierarchy.
+- **Tickets**: `/add @user` adds someone to a ticket (or a middleman trade), `/transfer @user` hands the ticket to another staff member.
 - **Middleman**: `/mm-setup @mmrole #logs [#category]` posts the request panel; `/middleman @partner` opens a trade.
   Flow: both traders confirm terms -> staff middleman claims -> middleman collects items -> marks Items Collected ->
   both traders press "I Received My Items" -> transcript posted to the log channel and the ticket auto-closes.

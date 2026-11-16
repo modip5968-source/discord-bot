@@ -1,12 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const CATEGORIES = {
-  '🛡️ Moderation': ['ban', 'kick', 'timeout', 'warn', 'warnings', 'lock', 'unlock'],
+  '🛡️ Moderation': ['ban', 'unban', 'kick', 'mute', 'unmute', 'warn', 'unwarn', 'warnings', 'lock', 'unlock'],
   '🛒 Shop': ['product-add', 'product-list', 'product-remove', 'product-stock', 'vouch', 'vouches', 'order-new', 'order-status', 'order-list'],
   '💰 Wallet & Levels': ['balance', 'pay', 'wallet-give', 'wallet-take', 'rank', 'leaderboard'],
   '🎉 Giveaways': ['giveaway'],
   '👋 Members': ['welcome', 'goodbye', 'boost', 'invites', 'autorole'],
-  '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'ticket-add', 'ticket-close'],
+  '🎭 Roles': ['promo', 'demo'],
+  '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'add', 'transfer', 'ticket-close'],
   '🤝 Middleman': ['mm-setup', 'middleman'],
   '🧰 Utility': ['help', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll', 'lol'],

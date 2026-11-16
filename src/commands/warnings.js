@@ -1,18 +1,16 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
-const warnCommand = require('./warn');
+const warningsStore = require('../warnings');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('warnings')
     .setDescription("View a member's warnings")
-    .addUserOption((opt) =>
-      opt.setName('member').setDescription('The member to look up').setRequired(true)
-    )
+    .addUserOption((opt) => opt.setName('member').setDescription('The member to look up').setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
     .setDMPermission(false),
   async execute(interaction) {
     const user = interaction.options.getUser('member');
-    const warnings = warnCommand.loadWarnings()[`${interaction.guildId}:${user.id}`] ?? [];
+    const warnings = warningsStore.list(interaction.guildId, user.id);
 
     if (warnings.length === 0) {
       return interaction.reply({ content: `**${user.tag}** has no warnings. 🎉`, ephemeral: true });

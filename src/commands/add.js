@@ -1,9 +1,10 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { isTicketChannel } = require('../tickets');
+const { getTrade } = require('../middleman');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('ticket-add')
+    .setName('add')
     .setDescription('Add a member to this ticket')
     .addUserOption((opt) =>
       opt.setName('member').setDescription('The member to add').setRequired(true)
@@ -13,7 +14,8 @@ module.exports = {
   async execute(interaction) {
     const member = interaction.options.getMember('member');
 
-    if (!isTicketChannel(interaction.channel)) {
+    const isTrade = Boolean(getTrade(interaction.channel.id));
+    if (!isTrade && !isTicketChannel(interaction.channel)) {
       return interaction.reply({ content: 'This is not a ticket channel.', ephemeral: true });
     }
     if (!member) {
