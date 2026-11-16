@@ -44,7 +44,7 @@ function infoRow() {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('middleman')
+    .setName('mm')
     .setDescription('What a middleman is - or open a middleman ticket with a partner')
     .addUserOption((o) => o.setName('partner').setDescription('Trading with someone? Opens a ticket with them'))
     .setDMPermission(false),
@@ -71,7 +71,7 @@ module.exports = {
       return interaction.reply({
         content: [
           '✅ Great. To trade safely:',
-          '• `/middleman @partner` opens a private ticket',
+          '• `/mm @partner` opens a private ticket',
           '• Both sides confirm the terms',
           '• Send your items **only** to the middleman who claims the ticket',
           '• Press **I Received My Items** when you have yours',
@@ -86,7 +86,7 @@ module.exports = {
           '❔ No problem - short version:',
           'A middleman holds both sides of the trade so neither person can run off with the other\'s items. You only get your stuff released once both sides confirm.',
           '',
-          'Open a ticket with `/middleman @partner` (or the ticket panel) and a middleman will walk you through each step.',
+          'Open a ticket with `/mm @partner` (or the ticket panel) and a middleman will walk you through each step.',
           'Full guide: `/mm-guide`',
         ].join('\n'),
         ephemeral: true,
