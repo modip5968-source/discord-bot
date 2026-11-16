@@ -71,6 +71,10 @@ up to an hour to appear the first time.
   Button lines are `Label | action`, where action is one of `role: <name or ID>`, `unrole: <name or ID>`,
   `ticket`, `text: <message>`, `link: <url>`. Created commands work as `/<name>` and `$<name>` in that server only.
   `/command list` shows them, `/command delete <name>` removes one (also unregisters it from Discord). Manage Server.
+- **MM staff toolkit**: `/mm-claim` (claim the ticket you're in), `/mm-release` (items released),
+  `/mm-cancel <reason>` (cancel + archive transcript), `/mm-list` (every open trade), `/mm-stats [middleman]`
+  (completed / cancelled / completion rate), `/mm-fee <amount> [percent]` (fee calculator, default 5%),
+  `/mm-guide` (safe trading guide, red flags), `/mm-report @user <reason>` (scammer report to the log channel + MM role ping).
 - **Middleman**: `/mm-setup @mmrole #logs [#category]` posts the request panel; `/middleman @partner` opens a trade.
   Flow: both traders confirm terms -> staff middleman claims -> middleman collects items -> marks Items Collected ->
   both traders press "I Received My Items" -> transcript posted to the log channel and the ticket auto-closes.

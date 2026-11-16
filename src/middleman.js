@@ -423,6 +423,11 @@ async function handleUserSelect(interaction) {
 
 module.exports = {
   STAGE_LABEL,
+  data,
+  finishTrade,
+  isMiddleman,
+  updateTrade,
+  createTrade,
   setConfig,
   getConfig,
   getTrade,

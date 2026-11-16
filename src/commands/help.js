@@ -9,7 +9,7 @@ const CATEGORIES = {
   '🎭 Roles': ['promo', 'demo'],
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'add', 'transfer', 'ticket-close'],
   '🚨 Anti-scam': ['gameover'],
-  '🤝 Middleman': ['mm-setup', 'middleman'],
+  '🤝 Middleman': ['mm-setup', 'middleman', 'mm-claim', 'mm-release', 'mm-cancel', 'mm-list', 'mm-stats', 'mm-fee', 'mm-guide', 'mm-report'],
   '🧰 Utility': ['help', 'command', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
   '🎲 Fun': ['eightball', 'roll', 'poll', 'lol'],
 };
