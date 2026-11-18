@@ -39,7 +39,7 @@ function infoRow() {
       .setCustomId('mmi:confused')
       .setLabel('CONFUSED')
       .setEmoji({ id: '1571910842260136027', name: 'warning', animated: true })
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Danger)
   );
 }
 
