@@ -345,29 +345,6 @@ client.on(Events.GuildCreate, (guild) => {
   checkJoin(guild).catch((e) => console.error('Guild guard failed:', e));
 });
 
-// Welcome message + auto-role on join
-client.on(Events.GuildMemberAdd, async (member) => {
-  try {
-    const cfg = load('guild-config')[member.guild.id] ?? {};
-
-    if (cfg.autoroleId) {
-      await member.roles.add(cfg.autoroleId).catch(() => {});
-    }
-    if (cfg.welcomeChannelId) {
-      const channel = member.guild.channels.cache.get(cfg.welcomeChannelId);
-      if (channel && channel.isTextBased()) {
-        const text = (cfg.welcomeMessage ?? 'Welcome {user} to **{server}**! 🎉')
-          .replaceAll('{user}', member.toString())
-          .replaceAll('{username}', member.user.username)
-          .replaceAll('{server}', member.guild.name);
-        await channel.send(text).catch(() => {});
-      }
-    }
-  } catch (err) {
-    console.error('Welcome/autorole failed:', err);
-  }
-});
-
 // Prefix commands ($ping, $kick @user spam, ...) + XP + AFK handling
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot || !message.guild) return;
