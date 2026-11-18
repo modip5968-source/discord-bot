@@ -5,6 +5,7 @@ const {
   ApplicationCommandOptionType,
 } = require('discord.js');
 const { load, save } = require('../store');
+const autoVouch = require('../vouches');
 
 function stars(n) {
   const v = Math.max(0, Math.min(5, Number(n) || 0));
@@ -86,10 +87,28 @@ module.exports = {
       embed.setFooter({ text: `Logged by ${interaction.user.tag} on behalf of ${fromUser.tag}` });
     }
 
-    await interaction.reply({
-      embeds: [embed],
-      allowedMentions: { parse: [] },
-    });
+    // post into the configured vouch channel, falling back to the current one
+    const targetId = autoVouch.getVouchChannelId(interaction.guildId);
+    const target =
+      targetId && targetId !== interaction.channelId
+        ? interaction.guild?.channels?.cache?.get(targetId) ??
+          (await interaction.guild?.channels?.fetch?.(targetId).catch(() => null))
+        : null;
+
+    if (!target || target.id === interaction.channelId) {
+      await interaction.reply({ embeds: [embed], allowedMentions: { parse: [] } });
+    } else {
+      const sent = await target
+        .send({ embeds: [embed], allowedMentions: { parse: [] } })
+        .catch(() => null);
+      if (!sent) {
+        return interaction.reply({
+          content: `I could not post in ${target} - check my Send Messages and Embed Links permissions there.`,
+          ephemeral: true,
+        });
+      }
+      await interaction.reply({ content: `✅ Vouch posted in ${target}.`, ephemeral: true });
+    }
 
     // count toward reputation
     try {
