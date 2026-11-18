@@ -73,6 +73,19 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  // Old vouch import modal
+  if (interaction.isModalSubmit() && interaction.customId === 'vimp:modal') {
+    try {
+      return await require('./commands/vouch-import').handleModal(interaction);
+    } catch (err) {
+      console.error('Vouch import failed:', err);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: 'Could not import that vouch.', ephemeral: true }).catch(() => {});
+      }
+      return;
+    }
+  }
+
   // Auto vouch review modal
   if (interaction.isModalSubmit() && interaction.customId.startsWith('vch:modal:')) {
     try {
