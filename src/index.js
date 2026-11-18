@@ -73,6 +73,19 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  // Auto vouch review modal
+  if (interaction.isModalSubmit() && interaction.customId.startsWith('vch:modal:')) {
+    try {
+      return await require('./vouches').handleReviewModal(interaction);
+    } catch (err) {
+      console.error('Vouch review failed:', err);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: 'Could not save that review.', ephemeral: true }).catch(() => {});
+      }
+      return;
+    }
+  }
+
   // Middleman: trade modal + partner picker + trade buttons
   try {
     if (interaction.isModalSubmit() && interaction.customId.startsWith('mm:modal:')) {
@@ -125,6 +138,11 @@ async function handleButton(interaction) {
   const { customId } = interaction;
 
   // Middleman trade buttons
+  // Auto vouch "Add your review" buttons
+  if (customId.startsWith('vch:')) {
+    return require('./vouches').handleReviewButton(interaction);
+  }
+
   // "What is a middleman" explainer buttons
   if (customId.startsWith('mmi:')) {
     return require('./commands/mm').handleButton(interaction);

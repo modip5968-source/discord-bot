@@ -388,6 +388,12 @@ async function handleButton(interaction) {
       await interaction.update({ embeds: [tradeEmbed(done)], components: components(true) });
       await interaction.channel.send('🎉 Both traders confirmed. Trade complete!').catch(() => {});
       await finishTrade(interaction.channel, 'completed');
+      try {
+        const autoVouch = require('./vouches');
+        await autoVouch.postTradeVouch(interaction.guild, { ...done, channelId: interaction.channelId });
+      } catch (err) {
+        console.error('Auto vouch failed:', err);
+      }
     } else {
       await interaction.update({ embeds: [tradeEmbed(updated)], components: components() });
     }
