@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { load, save } = require('../store');
 const { getConfig } = require('../middleman');
+const { EMOJI } = require('../emojis');
 
 const STORE = 'mm-reports';
 
@@ -44,7 +45,7 @@ module.exports = {
     const mmRole = cfg?.mmRoleId ? interaction.guild.roles.cache.get(cfg.mmRoleId) : null;
 
     const embed = new EmbedBuilder()
-      .setTitle('🚨 Scammer report')
+      .setTitle(`${EMOJI.warning} Scammer report`)
       .setColor(0xed4245)
       .addFields(
         { name: 'Reported user', value: `${target.tag} (\`${target.id}\`)`, inline: true },

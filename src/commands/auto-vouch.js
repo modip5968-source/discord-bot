@@ -6,6 +6,7 @@ const {
 } = require('discord.js');
 const { load, save } = require('../store');
 const autoVouch = require('../vouches');
+const { EMOJI } = require('../emojis');
 
 function stars(n) {
   const v = Math.max(0, Math.min(5, Number(n) || 0));
@@ -69,7 +70,7 @@ module.exports = {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle('✅ New Vouch')
+      .setTitle(`${EMOJI.verify} New Vouch`)
       .setColor(0x57f287)
       .addFields(
         { name: 'TO', value: `<@${to.id}>`, inline: true },

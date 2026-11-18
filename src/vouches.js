@@ -11,6 +11,7 @@ const {
   PermissionFlagsBits,
 } = require('discord.js');
 const { load, save } = require('./store');
+const { EMOJI } = require('./emojis');
 
 const CONFIG = 'vouch-config';
 const RECORDS = 'trade-vouches';
@@ -69,7 +70,7 @@ function reviewBlock(record, traderId) {
 
 function buildVouchEmbed(record) {
   const embed = new EmbedBuilder()
-    .setTitle('✅ New Vouch')
+    .setTitle(`${EMOJI.verify} New Vouch`)
     .setColor(0x57f287)
     .setDescription(`**${record.give || 'Items'} ↔ ${record.get || 'Items'}**`)
     .addFields(

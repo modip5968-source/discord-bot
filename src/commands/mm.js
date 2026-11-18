@@ -6,10 +6,11 @@ const {
   ButtonStyle,
 } = require('discord.js');
 const { startTrade } = require('../middleman');
+const { EMOJI } = require('../emojis');
 
 function infoEmbed() {
   return new EmbedBuilder()
-    .setTitle('❓ WHAT IS A MIDDLEMAN !?')
+    .setTitle(`${EMOJI.warning} WHAT IS A MIDDLEMAN !?`)
     .setColor(0x5865f2)
     .setDescription(
       [
