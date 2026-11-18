@@ -33,12 +33,12 @@ function infoRow() {
     new ButtonBuilder()
       .setCustomId('mmi:understood')
       .setLabel('UNDERSTOOD')
-      .setEmoji('☑️')
+      .setEmoji({ id: '1571803686101852192', name: 'verify', animated: true })
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId('mmi:confused')
       .setLabel('CONFUSED')
-      .setEmoji('❔')
+      .setEmoji({ id: '1571910842260136027', name: 'warning', animated: true })
       .setStyle(ButtonStyle.Secondary)
   );
 }
