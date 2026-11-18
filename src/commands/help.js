@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const CATEGORIES = {
-  '🛡️ Moderation': ['ban', 'unban', 'kick', 'mute', 'unmute', 'warn', 'unwarn', 'warnings', 'lock', 'unlock'],
+  '🛡️ Moderation': ['ban', 'unban', 'kick', 'mute', 'unmute', 'warn', 'unwarn', 'warnings', 'purge', 'nuke', 'lock', 'unlock'],
   '🛒 Shop': ['product-add', 'product-list', 'product-remove', 'product-stock', 'vouch', 'vouches', 'order-new', 'order-status', 'order-list'],
   '💰 Wallet & Levels': ['balance', 'pay', 'wallet-give', 'wallet-take', 'rank', 'leaderboard'],
   '🎉 Giveaways': ['giveaway'],
