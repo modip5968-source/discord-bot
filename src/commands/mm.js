@@ -24,6 +24,7 @@ function infoEmbed() {
         '**5.** For maximum safety, always use a reputable and verified middleman approved by both parties.',
       ].join('\n')
     )
+    .setImage('https://media.base44.com/images/public/6addbd16bdd958d4ca47e74e/3c9eecd47_mm-diagram.jpg')
     .setFooter({ text: "Never send items to someone who DM'd you first - open a ticket instead." });
 }
 
