@@ -69,15 +69,21 @@ module.exports = {
     const mention = interaction.user;
 
     if (interaction.customId === 'mmi:understood') {
+      const embed = new EmbedBuilder()
+        .setColor(0x57f287)
+        .setDescription(`**${mention} has understood !!**`);
       return interaction.reply({
-        content: `**${mention} has understood !!**`,
+        embeds: [embed],
         allowedMentions: { users: [interaction.user.id] },
       });
     }
 
     if (interaction.customId === 'mmi:confused') {
+      const embed = new EmbedBuilder()
+        .setColor(0xed4245)
+        .setDescription(`**${mention} is still confused don't worry staff will help you !!**`);
       return interaction.reply({
-        content: `**${mention} is still confused don't worry staff will help you !!**`,
+        embeds: [embed],
         allowedMentions: { users: [interaction.user.id] },
       });
     }
