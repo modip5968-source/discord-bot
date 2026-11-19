@@ -26,7 +26,8 @@ module.exports = {
   async execute(interaction) {
     const channel = interaction.options.getChannel('channel') ?? interaction.channel;
 
-    const image = interaction.options.getString('image');
+    const rawImage = interaction.options.getString('image');
+    const image = rawImage?.trim().match(/^https?:\/\/\S+$/i) ? rawImage.trim() : null;
 
     const embed = new EmbedBuilder()
       .setTitle('🎫 Support Tickets')
@@ -45,6 +46,8 @@ module.exports = {
     );
 
     await channel.send({ embeds: [embed], components: [row] });
-    await interaction.reply({ content: `Ticket panel posted in ${channel}.`, ephemeral: true });
+
+    const note = rawImage && !image ? "\n⚠️ I skipped `image` because it is not a link - paste a URL ending in .png/.jpg." : '';
+    await interaction.reply({ content: `Ticket panel posted in ${channel}.${note}`, ephemeral: true });
   },
 };
