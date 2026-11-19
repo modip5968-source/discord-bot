@@ -5,7 +5,7 @@ const CATEGORIES = {
   '📈 Levels': ['rank', 'leaderboard'],
   '🎉 Giveaways': ['giveaway'],
   '👋 Members': ['welcome', 'goodbye', 'boost', 'invites', 'autorole'],
-  '🎭 Roles': ['demo'],
+  '🎭 Roles': ['promo', 'demo'],
   '🎫 Tickets': ['ticket-panel', 'ticket-panel-edit', 'ticket-open', 'add', 'transfer', 'ticket-close'],
   '🤝 Middleman': ['mm', 'auto-vouch', 'vouch-import', 'vouch-channel', 'vouch', 'vouches', 'mm-setup', 'mm-claim', 'mm-release', 'mm-cancel', 'mm-list', 'mm-stats', 'mm-fee', 'mm-guide', 'mm-report'],
   '🧰 Utility': ['help', 'xd', 'avatar', 'serverinfo', 'say', 'announce', 'embed', 'afk'],
