@@ -6,6 +6,9 @@ module.exports = {
     .setName('messager')
     .setDescription('Send a message in an embed, repeating on a timer')
     .addStringOption((o) =>
+      o.setName('title').setDescription('Bold heading above the message (optional)').setMaxLength(256)
+    )
+    .addStringOption((o) =>
       o.setName('message').setDescription('What to say').setRequired(true).setMaxLength(2000)
     )
     .addStringOption((o) =>
@@ -25,6 +28,7 @@ module.exports = {
 
   async execute(interaction) {
     const text = interaction.options.getString('message').trim();
+    const title = interaction.options.getString('title')?.trim() || null;
     const rawTime = interaction.options.getString('time');
     const amount = interaction.options.getInteger('amount');
     const channel = interaction.options.getChannel('channel') ?? interaction.channel;
@@ -49,6 +53,7 @@ module.exports = {
       guildId: interaction.guildId,
       channelId: channel.id,
       text,
+      title,
       intervalMs,
       amount,
       createdBy: interaction.user.id,
@@ -62,6 +67,7 @@ module.exports = {
         { name: 'Every', value: humanInterval(intervalMs), inline: true },
         { name: 'Times', value: `0 / ${amount}`, inline: true },
         { name: 'First post', value: `<t:${Math.floor(job.nextRun / 1000)}:R> (<t:${Math.floor(job.nextRun / 1000)}:t>)` },
+        { name: 'Title', value: title ?? '*(none)*', inline: true },
         { name: 'Message', value: text.length > 900 ? `${text.slice(0, 900)}…` : text }
       )
       .setFooter({ text: `ID ${job.id} - stop it with /messager-stop` });

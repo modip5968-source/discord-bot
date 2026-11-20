@@ -30,8 +30,10 @@ function humanInterval(ms) {
 }
 
 // No footer, no author, no "automated" note - it reads like a normal announcement.
-function buildEmbed(text) {
-  return new EmbedBuilder().setColor(0x2b2d31).setDescription(text.slice(0, 4000));
+function buildEmbed(text, title) {
+  const embed = new EmbedBuilder().setColor(0x2b2d31).setDescription(text.slice(0, 4000));
+  if (title) embed.setTitle(title.slice(0, 256));
+  return embed;
 }
 
 function getJobs() {
@@ -42,7 +44,7 @@ function saveJobs(jobs) {
   save('messager', { jobs });
 }
 
-function addJob({ guildId, channelId, text, intervalMs, amount, createdBy }) {
+function addJob({ guildId, channelId, text, title, intervalMs, amount, createdBy }) {
   const jobs = getJobs();
   const id = Math.random().toString(36).slice(2, 8);
   jobs[id] = {
@@ -50,6 +52,7 @@ function addJob({ guildId, channelId, text, intervalMs, amount, createdBy }) {
     guildId,
     channelId,
     text,
+    title: title || null,
     intervalMs,
     amount,
     sent: 0,
@@ -100,7 +103,7 @@ async function runDue(client) {
         removeJob(job.id);
         continue;
       }
-      await channel.send({ embeds: [buildEmbed(job.text)], allowedMentions: { parse: [] } });
+      await channel.send({ embeds: [buildEmbed(job.text, job.title)], allowedMentions: { parse: [] } });
       advance(job.id);
     } catch (err) {
       console.error(`Messager ${job.id} failed:`, err);
