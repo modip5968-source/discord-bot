@@ -6,9 +6,6 @@ module.exports = {
     .setName('messager')
     .setDescription('Send a message in an embed, repeating on a timer')
     .addStringOption((o) =>
-      o.setName('title').setDescription('Bold heading above the message (optional)').setMaxLength(256)
-    )
-    .addStringOption((o) =>
       o.setName('message').setDescription('What to say').setRequired(true).setMaxLength(2000)
     )
     .addStringOption((o) =>
@@ -22,6 +19,9 @@ module.exports = {
     )
     .addChannelOption((o) =>
       o.setName('channel').setDescription('Where to post (defaults to this channel)').addChannelTypes(ChannelType.GuildText)
+    )
+    .addStringOption((o) =>
+      o.setName('title').setDescription('Bold heading above the message (optional)').setMaxLength(256)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .setDMPermission(false),
