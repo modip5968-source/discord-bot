@@ -18,6 +18,7 @@ const { handlePrefixCommand } = require('./prefix');
 const { load } = require('./store');
 const { addXp } = require('./levels');
 const { resumeAll, getGiveaway, putGiveaway, reroll, buildEmbed } = require('./giveaways');
+const { startScheduler } = require('./messager');
 const { enforceAll, checkJoin } = require('./guild-guard');
 const invites = require('./invites');
 const middleman = require('./middleman');
@@ -63,6 +64,9 @@ client.once(Events.ClientReady, async (c) => {
 
   // Resume unfinished giveaways (survives restarts)
   resumeAll(c);
+
+  // Repeating message scheduler
+  startScheduler(c);
 
   // Cache invite uses so we can tell who invited each new member
   await invites.cacheAll(c);
