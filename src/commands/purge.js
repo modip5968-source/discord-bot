@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const access = require('../mod-access');
 const modlog = require('../modlog');
 
 const MAX = 100;          // Discord's bulk delete limit per call
@@ -13,10 +14,12 @@ module.exports = {
     )
     .addUserOption((o) => o.setName('user').setDescription('Only delete messages from this member'))
     .addStringOption((o) => o.setName('reason').setDescription('Reason for the audit log'))
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .setDMPermission(false),
 
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ManageMessages);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const amount = interaction.options.getInteger('amount');
     const target = interaction.options.getUser('user');
     const reason = interaction.options.getString('reason') ?? `Purged by ${interaction.user.tag}`;

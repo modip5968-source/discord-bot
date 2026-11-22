@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const access = require('../mod-access');
 const modlog = require('../modlog');
 
 module.exports = {
@@ -9,9 +10,11 @@ module.exports = {
       o.setName('user_id').setDescription('The banned user ID (or paste their mention)').setRequired(true)
     )
     .addStringOption((o) => o.setName('reason').setDescription('Reason for the unban').setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .setDMPermission(false),
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.BanMembers);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const raw = interaction.options.getString('user_id');
     const reason = interaction.options.getString('reason') ?? 'No reason provided';
     const id = String(raw).replace(/[^0-9]/g, '');

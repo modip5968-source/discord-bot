@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const access = require('../mod-access');
 const warnings = require('../warnings');
 const modlog = require('../modlog');
 
@@ -9,9 +10,11 @@ module.exports = {
     .addUserOption((opt) => opt.setName('member').setDescription('The member to unwarn').setRequired(true))
     .addStringOption((opt) => opt.setName('reason').setDescription('Why the warning is being removed').setRequired(true))
     .addBooleanOption((opt) => opt.setName('all').setDescription('Remove every warning from this member'))
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
     .setDMPermission(false),
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ModerateMembers);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const user = interaction.options.getUser('member');
     const reason = interaction.options.getString('reason') ?? 'No reason provided';
     const all = interaction.options.getBoolean('all') ?? false;

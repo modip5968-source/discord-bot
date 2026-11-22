@@ -1,14 +1,17 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const access = require('../mod-access');
 const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('nuke')
     .setDescription('Wipe this channel - deletes and recreates it with the same name, category and permissions')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
     .setDMPermission(false),
 
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ManageChannels);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const channel = interaction.channel;
 
     if (!channel || !channel.guild) {

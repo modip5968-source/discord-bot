@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const access = require('../mod-access');
 const warningsStore = require('../warnings');
 
 module.exports = {
@@ -6,9 +7,11 @@ module.exports = {
     .setName('warnings')
     .setDescription("View a member's warnings")
     .addUserOption((opt) => opt.setName('member').setDescription('The member to look up').setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
     .setDMPermission(false),
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ModerateMembers);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const user = interaction.options.getUser('member');
     const warnings = warningsStore.list(interaction.guildId, user.id);
 

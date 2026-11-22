@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const access = require('../mod-access');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -13,9 +14,11 @@ module.exports = {
     .addStringOption((opt) =>
       opt.setName('reason').setDescription('Reason for locking')
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
     .setDMPermission(false),
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ManageChannels);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const channel = interaction.options.getChannel('channel') ?? interaction.channel;
     const reason = interaction.options.getString('reason') ?? 'No reason provided';
 

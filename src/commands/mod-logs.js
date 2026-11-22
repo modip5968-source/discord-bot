@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, EmbedBuilder } = require('discord.js');
+const access = require('../mod-access');
 const modlog = require('../modlog');
 
 module.exports = {
@@ -14,10 +15,12 @@ module.exports = {
     .addBooleanOption((o) =>
       o.setName('off').setDescription('Turn moderation logging off')
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
 
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ManageGuild);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const channel = interaction.options.getChannel('channel');
     const off = interaction.options.getBoolean('off');
     const guild = interaction.guild;

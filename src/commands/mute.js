@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const access = require('../mod-access');
 const modlog = require('../modlog');
 
 const MAX_MS = 28 * 24 * 60 * 60 * 1000; // Discord's timeout cap
@@ -43,14 +44,17 @@ module.exports = {
     .addUserOption((o) => o.setName('user').setDescription('The member to mute').setRequired(true))
     .addStringOption((o) => o.setName('time').setDescription('How long: 1m, 30m, 2h, 1d (max 28d)').setRequired(true))
     .addStringOption((o) => o.setName('reason').setDescription('Reason for the mute').setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
     .setDMPermission(false),
   async execute(interaction) {
+    const denied = access.guard(interaction, PermissionFlagsBits.ModerateMembers);
+    if (denied) return interaction.reply({ content: denied, ephemeral: true });
+
     const member = interaction.options.getMember('user');
     const time = interaction.options.getString('time');
     const reason = interaction.options.getString('reason') ?? 'No reason provided';
 
     if (!member) return interaction.reply({ content: 'That user is not in this server.', ephemeral: true });
+    if (!access.canActOn(interaction, member)) return interaction.reply({ content: access.HIERARCHY, ephemeral: true });
 
     const ms = parseDuration(time);
     if (!ms || ms < 1000) {
