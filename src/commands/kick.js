@@ -22,16 +22,10 @@ module.exports = {
       return interaction.reply({ content: 'I cannot kick that member (role hierarchy or missing permissions).', ephemeral: true });
 
     await member.kick(`${reason} — by ${interaction.user.tag}`);
-    await interaction.reply({
-      content: `${member} kicked | Reason: ${reason}`,
-      embeds: [
-        modlog.kicked({
+    await modlog.deliver(interaction, { content: `${member} kicked | Reason: ${reason}`, embed: modlog.kicked({
           target: member.user,
           moderator: interaction.user,
           reason,
-        }),
-      ],
-      allowedMentions: { parse: [] },
-    });
+        }), allowedMentions: { parse: [] } });
   },
 };

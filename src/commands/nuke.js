@@ -73,6 +73,13 @@ module.exports = {
       reason: 'Channel wiped and rebuilt (name, category and permissions kept)',
     });
 
+    const nukeLogged = await modlog.sendCard(interaction.guild, {
+      content: `Channel ${created} wiped and rebuilt`,
+      embed,
+      allowedMentions: { parse: [] },
+    });
+
     await created.send({ embeds: [embed] }).catch(() => {});
+    if (!nukeLogged) return;
   },
 };

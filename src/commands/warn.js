@@ -27,11 +27,7 @@ module.exports = {
       count: all.length,
     });
 
-    await interaction.reply({
-      content: `${user} has been warned | Reason: ${reason}`,
-      embeds: [embed],
-      allowedMentions: { users: [user.id] },
-    });
+    await modlog.deliver(interaction, { content: `${user} has been warned | Reason: ${reason}`, embed, allowedMentions: { users: [user.id] } });
 
     try {
       await user.send(`You were warned in **${interaction.guild.name}**: ${reason}`);

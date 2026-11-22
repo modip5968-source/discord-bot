@@ -22,16 +22,10 @@ module.exports = {
       return interaction.reply({ content: 'I cannot ban that member (role hierarchy or missing permissions).', ephemeral: true });
 
     await member.ban({ reason: `${reason} — by ${interaction.user.tag}` });
-    await interaction.reply({
-      content: `${member} banned | Reason: ${reason}`,
-      embeds: [
-        modlog.banned({
+    await modlog.deliver(interaction, { content: `${member} banned | Reason: ${reason}`, embed: modlog.banned({
           target: member.user,
           moderator: interaction.user,
           reason,
-        }),
-      ],
-      allowedMentions: { parse: [] },
-    });
+        }), allowedMentions: { parse: [] } });
   },
 };

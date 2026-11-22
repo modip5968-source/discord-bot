@@ -66,17 +66,23 @@ module.exports = {
     if (tooOld) notes.push(`${tooOld} message(s) were older than 14 days and skipped`);
     if (target) notes.push(`filtered to ${target.tag}`);
 
+    const purgeCard = modlog.purged({
+      channel,
+      amount: deleted.size,
+      moderator: interaction.user,
+      reason: interaction.options.getString('reason') ?? 'No reason provided',
+      target,
+    });
+    const purgeReason = interaction.options.getString('reason') ?? 'No reason provided';
+    const purgeLogged = await modlog.sendCard(interaction.guild, {
+      content: `Purged ${deleted.size} message(s) in ${channel} | Reason: ${purgeReason}`,
+      embed: purgeCard,
+      allowedMentions: { parse: [] },
+    });
+
     await interaction.editReply({
-      content: `Deleted ${deleted.size} message(s)${notes.length ? ` - ${notes.join(', ')}` : ''}.`,
-      embeds: [
-        modlog.purged({
-          channel,
-          amount: deleted.size,
-          moderator: interaction.user,
-          reason: interaction.options.getString('reason') ?? 'No reason provided',
-          target,
-        }),
-      ],
+      content: `Deleted ${deleted.size} message(s)${notes.length ? ` - ${notes.join(', ')}` : ''}.${purgeLogged ? ` Logged in ${purgeLogged}.` : ''}`,
+      embeds: purgeLogged ? [] : [purgeCard],
     });
 
     console.log(`Purge in #${channel.name} by ${interaction.user.tag}: ${deleted.size} messages (${reason})`);

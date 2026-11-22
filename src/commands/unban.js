@@ -26,16 +26,10 @@ module.exports = {
     }
 
     await interaction.guild.bans.remove(id, `${reason} — by ${interaction.user.tag}`);
-    await interaction.reply({
-      content: `${ban.user.tag} unbanned | Reason: ${reason}`,
-      embeds: [
-        modlog.unbanned({
+    await modlog.deliver(interaction, { content: `${ban.user.tag} unbanned | Reason: ${reason}`, embed: modlog.unbanned({
           target: ban.user,
           moderator: interaction.user,
           reason,
-        }),
-      ],
-      allowedMentions: { parse: [] },
-    });
+        }), allowedMentions: { parse: [] } });
   },
 };

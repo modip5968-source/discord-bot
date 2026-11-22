@@ -19,17 +19,11 @@ module.exports = {
     }
 
     await member.timeout(null, `Unmuted: ${reason} — by ${interaction.user.tag}`);
-    await interaction.reply({
-      content: `Timeout removed from ${member} | Reason: ${reason}`,
-      embeds: [
-        modlog.timeoutRemoved({
+    await modlog.deliver(interaction, { content: `Timeout removed from ${member} | Reason: ${reason}`, embed: modlog.timeoutRemoved({
           target: member.user,
           moderator: interaction.user,
           reason,
-        }),
-      ],
-      allowedMentions: { parse: [] },
-    });
+        }), allowedMentions: { parse: [] } });
 
     try {
       await member.send(`You were unmuted in **${interaction.guild.name}**. Reason: ${reason}`);

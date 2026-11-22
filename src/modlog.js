@@ -1,6 +1,7 @@
 // Professional moderation log cards - same look as the JMS style:
 // coloured bar, stacked labelled fields, target avatar as thumbnail.
 const { EmbedBuilder } = require('discord.js');
+const { load, save } = require('./store');
 
 const COLORS = {
   warn: 0xfaa61a,        // amber
@@ -156,3 +157,49 @@ module.exports = {
   purged,
   nuked,
 };
+
+// --- log channel config -----------------------------------------------------
+// data/modlog-config.json -> { guildId: { channelId } }
+function setLogChannel(guildId, channelId) {
+  const cfg = load('modlog-config');
+  if (channelId) cfg[guildId] = { channelId }; else delete cfg[guildId];
+  save('modlog-config', cfg);
+  return cfg[guildId] ? cfg[guildId].channelId : null;
+}
+
+function getLogChannelId(guildId) {
+  const cfg = load('modlog-config')[guildId];
+  return cfg && cfg.channelId ? cfg.channelId : null;
+}
+
+function logChannelFor(guild) {
+  const id = getLogChannelId(guild && guild.id);
+  if (!id) return null;
+  const ch = guild.channels && guild.channels.cache ? guild.channels.cache.get(id) : null;
+  return ch && ch.isTextBased && ch.isTextBased() ? ch : null;
+}
+
+async function sendCard(guild, payload) {
+  const ch = logChannelFor(guild);
+  if (!ch) return null;
+  try {
+    await ch.send({
+      content: payload.content || undefined,
+      embeds: payload.embed ? [payload.embed] : [],
+      allowedMentions: payload.allowedMentions || { parse: [] },
+    });
+    return ch;
+  } catch (e) { return null; }
+}
+
+async function deliver(interaction, payload) {
+  const ch = await sendCard(interaction.guild, payload);
+  if (ch) return interaction.reply({ content: 'Logged in ' + ch + '.', ephemeral: true });
+  return interaction.reply({
+    content: payload.content,
+    embeds: payload.embed ? [payload.embed] : [],
+    allowedMentions: payload.allowedMentions,
+  });
+}
+
+Object.assign(module.exports, { setLogChannel, getLogChannelId, logChannelFor, sendCard, deliver });

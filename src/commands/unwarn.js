@@ -42,18 +42,12 @@ module.exports = {
     }
 
     const left = warnings.list(interaction.guildId, user.id).length;
-    await interaction.reply({
-      content: `Warning removed from ${user} | Reason: ${reason}`,
-      embeds: [
-        modlog.warningRemoved({
+    await modlog.deliver(interaction, { content: `Warning removed from ${user} | Reason: ${reason}`, embed: modlog.warningRemoved({
           target: user,
           moderator: interaction.user,
           reason,
           originalModerator: removed.by ?? 'Unknown',
           left,
-        }),
-      ],
-      allowedMentions: { parse: [] },
-    });
+        }), allowedMentions: { parse: [] } });
   },
 };

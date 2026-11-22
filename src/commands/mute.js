@@ -64,18 +64,12 @@ module.exports = {
     }
 
     await member.timeout(ms, `${reason} — by ${interaction.user.tag}`);
-    await interaction.reply({
-      content: `${member} has been timed out | Reason: ${reason}`,
-      embeds: [
-        modlog.timedOut({
+    await modlog.deliver(interaction, { content: `${member} has been timed out | Reason: ${reason}`, embed: modlog.timedOut({
           target: member.user,
           moderator: interaction.user,
           reason,
           duration: humanize(ms),
-        }),
-      ],
-      allowedMentions: { users: [member.id] },
-    });
+        }), allowedMentions: { users: [member.id] } });
 
     try {
       await member.send(`You were muted in **${interaction.guild.name}** for ${humanize(ms)}. Reason: ${reason}`);
