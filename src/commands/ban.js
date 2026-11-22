@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,6 +22,16 @@ module.exports = {
       return interaction.reply({ content: 'I cannot ban that member (role hierarchy or missing permissions).', ephemeral: true });
 
     await member.ban({ reason: `${reason} — by ${interaction.user.tag}` });
-    await interaction.reply(`🔨 **${member.user.tag}** was banned. Reason: ${reason}`);
+    await interaction.reply({
+      content: `${member} banned | Reason: ${reason}`,
+      embeds: [
+        modlog.banned({
+          target: member.user,
+          moderator: interaction.user,
+          reason,
+        }),
+      ],
+      allowedMentions: { parse: [] },
+    });
   },
 };

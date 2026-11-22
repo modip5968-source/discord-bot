@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,7 +19,17 @@ module.exports = {
     }
 
     await member.timeout(null, `Unmuted: ${reason} — by ${interaction.user.tag}`);
-    await interaction.reply(`🔊 **${member.user.tag}** unmuted. Reason: ${reason}`);
+    await interaction.reply({
+      content: `Timeout removed from ${member} | Reason: ${reason}`,
+      embeds: [
+        modlog.timeoutRemoved({
+          target: member.user,
+          moderator: interaction.user,
+          reason,
+        }),
+      ],
+      allowedMentions: { parse: [] },
+    });
 
     try {
       await member.send(`You were unmuted in **${interaction.guild.name}**. Reason: ${reason}`);

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,6 +22,16 @@ module.exports = {
       return interaction.reply({ content: 'I cannot kick that member (role hierarchy or missing permissions).', ephemeral: true });
 
     await member.kick(`${reason} — by ${interaction.user.tag}`);
-    await interaction.reply(`👢 **${member.user.tag}** was kicked. Reason: ${reason}`);
+    await interaction.reply({
+      content: `${member} kicked | Reason: ${reason}`,
+      embeds: [
+        modlog.kicked({
+          target: member.user,
+          moderator: interaction.user,
+          reason,
+        }),
+      ],
+      allowedMentions: { parse: [] },
+    });
   },
 };

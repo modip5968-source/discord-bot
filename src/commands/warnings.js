@@ -17,13 +17,20 @@ module.exports = {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle(`Warnings for ${user.tag} (${warnings.length})`)
+      .setTitle(`Warnings for ${user.username}`)
       .setColor(0xfaa61a)
-      .setDescription(
-        warnings
-          .map((w, i) => `**${i + 1}.** ${w.reason} — by ${w.by} (<t:${Math.floor(new Date(w.at).getTime() / 1000)}:R>)`)
-          .join('\n')
-      );
+      .setThumbnail(user.displayAvatarURL())
+      .addFields(
+        warnings.map((w, i) => ({
+          name: `Warn #${i + 1}`,
+          value: [
+            `**Reason:** ${w.reason}`,
+            `**Moderator:** ${w.by}`,
+            `**Time:** <t:${Math.floor(new Date(w.at).getTime() / 1000)}:f>`,
+          ].join('\n'),
+        }))
+      )
+      .setFooter({ text: `Total warnings: ${warnings.length}` });
     await interaction.reply({ embeds: [embed], ephemeral: true });
   },
 };

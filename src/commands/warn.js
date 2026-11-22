@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const warnings = require('../warnings');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,7 +20,18 @@ module.exports = {
       at: new Date().toISOString(),
     });
 
-    await interaction.reply(`⚠️ **${user.tag}** warned (${all.length} total). Reason: ${reason}`);
+    const embed = modlog.warned({
+      target: user,
+      moderator: interaction.user,
+      reason,
+      count: all.length,
+    });
+
+    await interaction.reply({
+      content: `${user} has been warned | Reason: ${reason}`,
+      embeds: [embed],
+      allowedMentions: { users: [user.id] },
+    });
 
     try {
       await user.send(`You were warned in **${interaction.guild.name}**: ${reason}`);

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -66,11 +67,11 @@ module.exports = {
       return;
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle('💥 Channel nuked')
-      .setColor(0xed4245)
-      .setDescription(`Wiped and rebuilt by ${nukedBy}.\nSame name, category and permissions as before.`)
-      .setTimestamp();
+    const embed = modlog.nuked({
+      channel: created,
+      moderator: nukedBy,
+      reason: 'Channel wiped and rebuilt (name, category and permissions kept)',
+    });
 
     await created.send({ embeds: [embed] }).catch(() => {});
   },

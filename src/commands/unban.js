@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,6 +26,16 @@ module.exports = {
     }
 
     await interaction.guild.bans.remove(id, `${reason} — by ${interaction.user.tag}`);
-    await interaction.reply(`🔓 Unbanned **${ban.user.tag}**. Reason: ${reason}`);
+    await interaction.reply({
+      content: `${ban.user.tag} unbanned | Reason: ${reason}`,
+      embeds: [
+        modlog.unbanned({
+          target: ban.user,
+          moderator: interaction.user,
+          reason,
+        }),
+      ],
+      allowedMentions: { parse: [] },
+    });
   },
 };

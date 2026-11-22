@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const warnings = require('../warnings');
+const modlog = require('../modlog');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,12 +17,23 @@ module.exports = {
     const all = interaction.options.getBoolean('all') ?? false;
 
     if (all) {
+      const list = warnings.list(interaction.guildId, user.id);
       const removed = warnings.clear(interaction.guildId, user.id);
-      return interaction.reply(
-        removed
-          ? `✅ Cleared **${removed}** warning(s) from **${user.tag}**. Reason: ${reason}`
-          : `**${user.tag}** has no warnings to clear.`
-      );
+      if (!removed) return interaction.reply({ content: `**${user.tag}** has no warnings to clear.`, ephemeral: true });
+
+      return interaction.reply({
+        content: `Cleared ${removed} warning(s) from ${user} | Reason: ${reason}`,
+        embeds: [
+          modlog.warningRemoved({
+            target: user,
+            moderator: interaction.user,
+            reason,
+            originalModerator: list[list.length - 1]?.by ?? 'Unknown',
+            left: 0,
+          }),
+        ],
+        allowedMentions: { parse: [] },
+      });
     }
 
     const removed = warnings.removeLast(interaction.guildId, user.id);
@@ -30,8 +42,18 @@ module.exports = {
     }
 
     const left = warnings.list(interaction.guildId, user.id).length;
-    await interaction.reply(
-      `✅ Removed one warning from **${user.tag}** (${left} left). Original: *${removed.reason}* — Reason for removal: ${reason}`
-    );
+    await interaction.reply({
+      content: `Warning removed from ${user} | Reason: ${reason}`,
+      embeds: [
+        modlog.warningRemoved({
+          target: user,
+          moderator: interaction.user,
+          reason,
+          originalModerator: removed.by ?? 'Unknown',
+          left,
+        }),
+      ],
+      allowedMentions: { parse: [] },
+    });
   },
 };

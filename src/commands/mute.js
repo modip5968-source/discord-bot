@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 const MAX_MS = 28 * 24 * 60 * 60 * 1000; // Discord's timeout cap
 
@@ -63,7 +64,18 @@ module.exports = {
     }
 
     await member.timeout(ms, `${reason} — by ${interaction.user.tag}`);
-    await interaction.reply(`🔇 **${member.user.tag}** muted for **${humanize(ms)}**. Reason: ${reason}`);
+    await interaction.reply({
+      content: `${member} has been timed out | Reason: ${reason}`,
+      embeds: [
+        modlog.timedOut({
+          target: member.user,
+          moderator: interaction.user,
+          reason,
+          duration: humanize(ms),
+        }),
+      ],
+      allowedMentions: { users: [member.id] },
+    });
 
     try {
       await member.send(`You were muted in **${interaction.guild.name}** for ${humanize(ms)}. Reason: ${reason}`);

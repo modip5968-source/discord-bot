@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const modlog = require('../modlog');
 
 const MAX = 100;          // Discord's bulk delete limit per call
 const TWO_WEEKS = 14 * 24 * 60 * 60 * 1000;
@@ -66,7 +67,16 @@ module.exports = {
     if (target) notes.push(`filtered to ${target.tag}`);
 
     await interaction.editReply({
-      content: `🧹 Deleted **${deleted.size}** message(s)${notes.length ? ` - ${notes.join(', ')}` : ''}.`,
+      content: `Deleted ${deleted.size} message(s)${notes.length ? ` - ${notes.join(', ')}` : ''}.`,
+      embeds: [
+        modlog.purged({
+          channel,
+          amount: deleted.size,
+          moderator: interaction.user,
+          reason: interaction.options.getString('reason') ?? 'No reason provided',
+          target,
+        }),
+      ],
     });
 
     console.log(`Purge in #${channel.name} by ${interaction.user.tag}: ${deleted.size} messages (${reason})`);
