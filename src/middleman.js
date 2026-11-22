@@ -135,7 +135,7 @@ async function startTrade(interaction, partner) {
   const cfg = getConfig(interaction.guildId);
   if (!cfg) {
     return interaction.reply({
-      content: 'The middleman system is not set up yet. An admin needs to run `/mm-setup`.',
+      content: 'The middleman system is not set up yet. An admin needs to configure the middleman system.',
       ephemeral: true,
     });
   }
@@ -199,7 +199,7 @@ async function handleModal(interaction) {
   const mmRole = guild.roles.cache.get(cfg.mmRoleId);
   if (!mmRole) {
     return interaction.reply({
-      content: 'The middleman role is missing - an admin needs to re-run `/mm-setup`.',
+      content: 'The middleman role is missing - an admin needs to configure the middleman role.',
       ephemeral: true,
     });
   }
