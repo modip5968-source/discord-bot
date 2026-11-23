@@ -16,7 +16,7 @@ function getConfig() {
   return {
     allowed: new Set(data.guildIds ?? DEFAULT_ALLOWED),
     // reportOnly: log new servers but do NOT leave (used while whitelisting a new server)
-    reportOnly: Boolean(data.reportOnly),
+    reportOnly: data.reportOnly === undefined ? true : Boolean(data.reportOnly),
   };
 }
 
