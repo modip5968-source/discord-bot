@@ -21,7 +21,6 @@ function buildEmbed(gw, ended = false, winners = []) {
     .setColor(ended ? 0x99aab5 : 0x5865f2)
     .addFields(
       { name: 'Winners', value: `${gw.winners}`, inline: true },
-      { name: 'Entries', value: `${gw.participants.length}`, inline: true },
       { name: ended ? 'Status' : 'Ends', value: ended ? 'Ended' : end, inline: true }
     )
     .setFooter({ text: `Giveaway ID: ${gw.id}` });
