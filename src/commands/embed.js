@@ -19,6 +19,12 @@ module.exports = {
         .setDescription('Channel to send it in (defaults to this one)')
         .addChannelTypes(ChannelType.GuildText)
     )
+    .addStringOption((opt) =>
+      opt.setName('image').setDescription('Image URL shown large at the bottom of the embed')
+    )
+    .addStringOption((opt) =>
+      opt.setName('thumbnail').setDescription('Small image URL in the top-right corner')
+    )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .setDMPermission(false),
   async execute(interaction) {
@@ -26,6 +32,8 @@ module.exports = {
     const description = interaction.options.getString('description');
     const colorInput = interaction.options.getString('color');
     const channel = interaction.options.getChannel('channel') ?? interaction.channel;
+    const image = interaction.options.getString('image');
+    const thumbnail = interaction.options.getString('thumbnail');
 
     let color = 0x5865f2;
     if (colorInput) {
@@ -40,11 +48,22 @@ module.exports = {
       return interaction.reply({ content: 'I cannot send messages in that channel.', ephemeral: true });
     }
 
+    const isUrl = (v) => /^https?:\/\/[^\s]+$/i.test(v || '');
+
+    if (image && !isUrl(image)) {
+      return interaction.reply({ content: 'Image must be a direct http(s) link to a picture.', ephemeral: true });
+    }
+    if (thumbnail && !isUrl(thumbnail)) {
+      return interaction.reply({ content: 'Thumbnail must be a direct http(s) link to a picture.', ephemeral: true });
+    }
+
     const embed = new EmbedBuilder()
       .setTitle(title)
       .setDescription(description)
-      .setColor(color)
-      .setFooter({ text: `By ${interaction.user.tag}` });
+      .setColor(color);
+
+    if (image) embed.setImage(image);
+    if (thumbnail) embed.setThumbnail(thumbnail);
 
     await channel.send({ embeds: [embed] });
     await interaction.reply({ content: `Embed sent in ${channel}.`, ephemeral: true });
