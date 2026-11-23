@@ -14,7 +14,8 @@ const DEFAULT_ALLOWED = [
 function getConfig() {
   const data = load('allowlist');
   return {
-    allowed: new Set(data.guildIds ?? DEFAULT_ALLOWED),
+    // union: the code list always counts, the data file can only add more
+    allowed: new Set([...DEFAULT_ALLOWED, ...(Array.isArray(data.guildIds) ? data.guildIds : [])]),
     // reportOnly: log new servers but do NOT leave (used while whitelisting a new server)
     reportOnly: data.reportOnly === undefined ? true : Boolean(data.reportOnly),
   };
